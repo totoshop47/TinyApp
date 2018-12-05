@@ -10,10 +10,10 @@
   </header>
   <ul>
     <% for(var shortURL in urls) { %>
-    <li><%= `${shortURL} , ${urls[shortURL]}` %></li>
+    <li><a href= <%= urls[shortURL] %>><%= `${shortURL}` %></a> <%= `, ${urls[shortURL]}` %></li>
     <% } %>
   </ul>
-  <a href='#'>link for new shorten URL</a>
+
 </body>
 </html>
 

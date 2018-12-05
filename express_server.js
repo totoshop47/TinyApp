@@ -51,9 +51,9 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // debug statement to see POST parameters
   let templateVars = { urls: urlDatabase };
-  let shortURL = generateRandomString();
-  let longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  // let shortURL = generateRandomString();
+  // let longURL = req.body.longURL;
+  urlDatabase[generateRandomString()] = req.body.longURL;
   res.render("urls_index", templateVars);
 });
 
