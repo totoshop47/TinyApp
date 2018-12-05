@@ -23,7 +23,7 @@ var urlDatabase = {
 };
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.send("<html><body><a href='/urls'>To IndexPage</a></body></html>");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -31,7 +31,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+  res.send("<html><body>Hello<b>World</b></body></html>\n");
 });
 
 app.get("/urls", (req, res) => {
@@ -43,18 +43,32 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+app.post("/urls/:id", (req, res) => {
+  // console.log("keyData:  " + req.params.id)
+  // console.log("userInput : " + req.body.longURL);
+  urlDatabase[req.params.id] = req.body.longURL;
+  res.redirect("/urls");
+});
+
+app.post("/urls/:id/delete", (req, res) => {
+  // console.log(urlDatabase[req.params.shortURL]);
+  delete urlDatabase[req.params.id];
+
+  res.redirect("/urls");
+});
+
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id };
+  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id]  };
   res.render("urls_show", templateVars);
 });
 
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // debug statement to see POST parameters
-  let templateVars = { urls: urlDatabase };
   // let shortURL = generateRandomString();
   // let longURL = req.body.longURL;
   urlDatabase[generateRandomString()] = req.body.longURL;
-  res.render("urls_index", templateVars);
+  // res.render("urls_index", templateVars);
+  res.redirect("/urls");
 });
 
 app.get("/u/:shortURL", (req, res) => {
