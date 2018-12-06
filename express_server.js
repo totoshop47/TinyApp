@@ -4,6 +4,14 @@ var PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 
+function checkEmail(email) {
+  for(var i in users) {
+    if(users[i]["email"] === email) {
+      return true;
+    }
+    return false;
+  }
+}
 
 function generateRandomString() {
   var rString = "";
@@ -25,17 +33,61 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
+
+
 app.get("/", (req, res) => {
-    let templateVars = {
-      urls: urlDatabase,
-      username: req.cookies["username"]
-    };
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
   res.send("<html><body><a href='/urls'>To IndexPage</a></body></html>");
     // Cookies that have not been signed
   console.log('Cookies: ', req.cookies);
 
   // Cookies that have been signed
   console.log('Signed Cookies: ', req.signedCookies);
+});
+
+app.get("/register", (req, res) => {
+
+  res.render("registration");
+});
+
+app.post("/register", (req, res) => {
+  let randomID = generateRandomString();
+  let id = randomID;
+  let email = req.body.email;
+  let password = req.body.password;
+  if(email !== "" && password !== "" && !checkEmail(email)) {
+    users[randomID] = {id, email, password};
+    res.cookie("user_id", id);
+    res.redirect('/urls');
+  } else {
+    res.status(400).send('Bad request');
+  }
+  // console.log(checkEmail(email));
+  // console.log(req.cookies);
+  // users[randomID][id] = id;
+  // req.body.id = randomID;
+  // users[randomID].email = req.body.email;
+  // users[randomID].password = req.body.password;
+  // console.log(req.body);
+  // console.log(req.body.email);
+  // console.log(req.body.password);
+  // console.log(users);
+  // res.redirect("/urls");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -74,7 +126,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-    let templateVars = {
+  let templateVars = {
     urls: urlDatabase,
     username: req.cookies["username"]
   };
