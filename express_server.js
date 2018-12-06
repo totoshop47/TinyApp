@@ -2,6 +2,8 @@ var express = require("express");
 var app = express();
 var PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+
 
 function generateRandomString() {
   var rString = "";
@@ -12,6 +14,7 @@ function generateRandomString() {
 
   return rString;
 }
+app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -23,7 +26,16 @@ var urlDatabase = {
 };
 
 app.get("/", (req, res) => {
+    let templateVars = {
+      urls: urlDatabase,
+      username: req.cookies["username"]
+    };
   res.send("<html><body><a href='/urls'>To IndexPage</a></body></html>");
+    // Cookies that have not been signed
+  console.log('Cookies: ', req.cookies);
+
+  // Cookies that have been signed
+  console.log('Signed Cookies: ', req.signedCookies);
 });
 
 app.get("/urls.json", (req, res) => {
@@ -34,13 +46,39 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello<b>World</b></body></html>\n");
 });
 
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username);
+  // console.log(req.body)
+  // console.log(req.body.username);
+  // console.log(req.cookies)
+  // console.log(req.signedCookies)
+
+  res.redirect("/urls");
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  // console.log(req.body)
+  // console.log(req.cookies)
+  // console.log(req.signedCookies)
+
+  res.redirect("/urls");
+})
+
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+    let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
+  res.render("urls_new", templateVars);
 });
 
 app.post("/urls/:id", (req, res) => {
@@ -58,7 +96,11 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id]  };
+  let templateVars = {
+    shortURL: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"]
+  };
   res.render("urls_show", templateVars);
 });
 

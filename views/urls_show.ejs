@@ -2,6 +2,9 @@
 <html>
   <head></head>
   <body>
+    <header>
+      <% include ./partials/_header %>
+    </header>
     <h1>ShortURL: <%= shortURL %></h1>
     <form method="POST" action="/urls/<%= shortURL %>">
       <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
