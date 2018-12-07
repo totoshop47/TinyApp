@@ -1,18 +1,17 @@
   <% if(username) { %>
     <form method="POST" action="/logout">
-      <%= username %>
+      <%= user.email %>
       <input type="submit" value="Logout" />
     </form>
   <% } else { %>
     <form method="POST" action="/login">
-      <input type="text" name="username" placeholder="username" />
+      <input type="text" name="user_id" placeholder="user_id" />
       <input type="submit" value="Login" />
     </form>
     <form method="GET">
       <a href="/register">Sign up</a>
     </form>
   <% } %>
-
 
 
 

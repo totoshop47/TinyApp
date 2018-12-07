@@ -43,9 +43,13 @@ const users = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "dishwasher-funk"
+  },
+  "sndd67": {
+    id: "sndd67",
+    email: "demacia@noxian.com",
+    password: "123123"
   }
 };
-
 
 app.get("/", (req, res) => {
   let templateVars = {
@@ -53,10 +57,10 @@ app.get("/", (req, res) => {
     username: req.cookies["username"]
   };
   res.send("<html><body><a href='/urls'>To IndexPage</a></body></html>");
-  console.log('Cookies: ', req.cookies);
-  console.log('Signed Cookies: ', req.signedCookies);
-  console.log(templateVars.urls);
-  console.log(users);
+  // console.log(templateVars.urls);
+  // console.log(templateVars);
+  // console.log(users);
+  // console.log(users.userRandomID);
 });
 
 app.get("/register", (req, res) => {
@@ -76,17 +80,6 @@ app.post("/register", (req, res) => {
   } else {
     res.status(400).send('Bad request');
   }
-  // console.log(checkEmail(email));
-  // console.log(req.cookies);
-  // users[randomID][id] = id;
-  // req.body.id = randomID;
-  // users[randomID].email = req.body.email;
-  // users[randomID].password = req.body.password;
-  // console.log(req.body);
-  // console.log(req.body.email);
-  // console.log(req.body.password);
-  // console.log(users);
-  // res.redirect("/urls");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -98,69 +91,77 @@ app.get("/hello", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  // console.log(req.body)
-  // console.log(req.body.username);
-  // console.log(req.cookies)
-  // console.log(req.signedCookies)
-
+  res.cookie("user_id", req.body.user_id);
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
-  // console.log(req.body)
-  // console.log(req.cookies)
-  // console.log(req.signedCookies)
-
+  res.clearCookie("user_id");
   res.redirect("/urls");
 })
 
+// const users = {
+//   "userRandomID": {
+//     id: "userRandomID",
+//     email: "user@example.com",
+//     password: "purple-monkey-dinosaur"
+//   },
+//  "user2RandomID": {
+//     id: "user2RandomID",
+//     email: "user2@example.com",
+//     password: "dishwasher-funk"
+//   }
+// };
+function getUserObj(email) {
+for(var key in users) {
+
+  }
+}
+
 app.get("/urls", (req, res) => {
-  // let templateVars = {
-  //   urls: urlDatabase,
-  //   username: req.cookies["username"]
-  // };
-  res.render("urls_index", users);
+  const userId = req.cookies.user_id;
+  const user = users[userId];
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["user_id"],
+    user: user
+  }
+  // console.log(req.cookies)
+
+  res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  // let templateVars = {
-  //   urls: urlDatabase,
-  //   username: req.cookies["username"]
-  // };
-  res.render("urls_new", users);
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["user_id"]
+  };
+
+  res.render("urls_new", templateVars);
 });
 
 app.post("/urls/:id", (req, res) => {
-  // console.log("keyData:  " + req.params.id)
-  // console.log("userInput : " + req.body.longURL);
   urlDatabase[req.params.id] = req.body.longURL;
   res.redirect("/urls");
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  // console.log(urlDatabase[req.params.shortURL]);
   delete urlDatabase[req.params.id];
 
   res.redirect("/urls");
 });
 
 app.get("/urls/:id", (req, res) => {
-  // let templateVars = {
-  //   shortURL: req.params.id,
-  //   longURL: urlDatabase[req.params.id],
-  //   username: req.cookies["username"]
-  // };
-  res.render("urls_show", users);
+  let templateVars = {
+    shortURL: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["user_id"]
+  };
+  res.render("urls_show", templateVars);
 });
 
 app.post("/urls", (req, res) => {
-  // console.log(req.body);  // debug statement to see POST parameters
-  // let shortURL = generateRandomString();
-  // let longURL = req.body.longURL;
   urlDatabase[generateRandomString()] = req.body.longURL;
-  // res.render("urls_index", templateVars);
   res.redirect("/urls");
 });
 
