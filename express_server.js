@@ -53,11 +53,10 @@ app.get("/", (req, res) => {
     username: req.cookies["username"]
   };
   res.send("<html><body><a href='/urls'>To IndexPage</a></body></html>");
-    // Cookies that have not been signed
   console.log('Cookies: ', req.cookies);
-
-  // Cookies that have been signed
   console.log('Signed Cookies: ', req.signedCookies);
+  console.log(templateVars.urls);
+  console.log(users);
 });
 
 app.get("/register", (req, res) => {
@@ -118,19 +117,19 @@ app.post("/logout", (req, res) => {
 })
 
 app.get("/urls", (req, res) => {
-  let templateVars = {
-    urls: urlDatabase,
-    username: req.cookies["username"]
-  };
-  res.render("urls_index", templateVars);
+  // let templateVars = {
+  //   urls: urlDatabase,
+  //   username: req.cookies["username"]
+  // };
+  res.render("urls_index", users);
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = {
-    urls: urlDatabase,
-    username: req.cookies["username"]
-  };
-  res.render("urls_new", templateVars);
+  // let templateVars = {
+  //   urls: urlDatabase,
+  //   username: req.cookies["username"]
+  // };
+  res.render("urls_new", users);
 });
 
 app.post("/urls/:id", (req, res) => {
@@ -148,12 +147,12 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = {
-    shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"]
-  };
-  res.render("urls_show", templateVars);
+  // let templateVars = {
+  //   shortURL: req.params.id,
+  //   longURL: urlDatabase[req.params.id],
+  //   username: req.cookies["username"]
+  // };
+  res.render("urls_show", users);
 });
 
 app.post("/urls", (req, res) => {
