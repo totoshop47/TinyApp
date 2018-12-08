@@ -22,6 +22,17 @@ function generateRandomString() {
 
   return rString;
 }
+
+function getUserObj(emailInput) {
+  for(var key in users) {
+    if(users[key].email === emailInput) {
+      return users[key];
+    }
+  }
+  return false;
+}
+
+
 app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -106,40 +117,20 @@ app.get("/urls/login", (req, res) => {
   res.render("urls_login", templateVars);
 });
 
-function getUserObj(email) {
-  for(var key in users) {
-    if(users[key].email === email) {
-      // console.log(users[key]);
-      return users[key]
-    }
-  }
-}
-
 app.post("/urls/login", (req, res) => {
   userObj = getUserObj(req.body.email)
-  res.cookie("user_id", userObj.id);
-  // console.log(users);
-  res.redirect("/urls");
+  if(req.body.email === userObj.email && req.body.password === userObj.password) {
+    res.cookie("user_id", userObj.id);
+    res.redirect("/urls");
+  } else {
+    res.status(403).send('Forbidden');
+  }
 });
 
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
-})
-
-// const users = {
-//   "userRandomID": {
-//     id: "userRandomID",
-//     email: "user@example.com",
-//     password: "purple-monkey-dinosaur"
-//   },
-//  "user2RandomID": {
-//     id: "user2RandomID",
-//     email: "user2@example.com",
-//     password: "dishwasher-funk"
-//   }
-// };
-
+});
 
 app.get("/urls", (req, res) => {
   const userId = req.cookies.user_id;
