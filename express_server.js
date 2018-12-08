@@ -40,8 +40,11 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { userID: "sndd67",
+              longUrl: "http://www.lighthouselabs.ca"},
+
+  "9sm5xK": { userID: "user2RandomID",
+              longUrl: "http://www.google.com"}
 };
 
 const users = {
@@ -65,10 +68,16 @@ const users = {
 app.get("/", (req, res) => {
   const userId = req.cookies.user_id;
   const user = users[userId];
-  let templateVars = {
-    urls: urlDatabase,
-    user: user
-  }
+  // console.log(urlDatabase[req.params], '<<<<<<<<<<<< longURL')
+  // console.log(urlDatabase, '<<<<<<<<<<<< urls')
+  // console.log(req.body.id, '<<<<<<<<<<<<< req.params.id')
+  // let templateVars = {
+  //   urls: urlDatabase,
+  //   user: user,
+  //   shortURL: req.params.id,
+  //   longURL: urlDatabase[req.params.id].longUrl,
+  // }
+
   res.send("<html><body><a href='/urls'>To IndexPage</a></body></html>");
 });
 
@@ -77,7 +86,9 @@ app.get("/urls/register", (req, res) => {
   const user = users[userId];
   let templateVars = {
     urls: urlDatabase,
-    user: user
+    user: user,
+    // shortURL: req.params.id,
+    // longURL: urlDatabase[req.params.id].longUrl,
   }
   res.render("registration", templateVars);
 });
@@ -109,7 +120,9 @@ app.get("/urls/login", (req, res) => {
   const user = users[userId];
   let templateVars = {
     urls: urlDatabase,
-    user: user
+    user: user,
+    // shortURL: req.params.id,
+    // longURL: urlDatabase[req.params.id].longUrl,
   }
   res.render("urls_login", templateVars);
 });
@@ -128,13 +141,19 @@ app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
-
+//
+// Where did I finish yesterday? Updated template vars, it's set to loop and get the shortUrls and longUrls
+// For specfic user and check by id.
+//
 app.get("/urls", (req, res) => {
   const userId = req.cookies.user_id;
   const user = users[userId];
   let templateVars = {
     urls: urlDatabase,
-    user: user
+    user: user,
+    userId: userId,
+    // shortURL: req.params.id,
+    // longURL: urlDatabase[req.params.id].longUrl,
   }
   // console.log(users)
   res.render("urls_index", templateVars);
@@ -145,13 +164,19 @@ app.get("/urls/new", (req, res) => {
   const user = users[userId];
   let templateVars = {
     urls: urlDatabase,
-    user: user
+    user: user,
+    // shortURL: req.params.id,
+    // longURL: urlDatabase[req.params.id].longUrl,
   }
-  res.render("urls_new", templateVars);
+  if(userId){
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/urls");
+  }
 });
 
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
+  urlDatabase[req.params.id].longUrl = req.body.longURL;
   res.redirect("/urls");
 });
 
@@ -162,15 +187,24 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+  const userId = req.cookies.user_id;
+  const user = users[userId];
   let templateVars = {
-    shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    urls: urlDatabase,
+    user: user,
+    // shortURL: req.params.id,
+    // longURL: urlDatabase[req.params.id].longUrl,
   };
+  console.log(req.params.id, '<<<<<<<<<<<<<< req.params.id');
+  console.log(urlDatabase[req.params.id].longUrl, '<<<<<<<<<<<<<< urlsDatabase[req.params.id]');
   res.render("urls_show", templateVars);
 });
 
 app.post("/urls", (req, res) => {
-  urlDatabase[generateRandomString()] = req.body.longURL;
+  var gRandom = generateRandomString();
+  urlDatabase[gRandom] = req.body.longURL;
+  // console.log(urlDatabase[gRandom]);
+  console.log(req.body.longURL, '<<<<<<<<<<<<<<<< req.body.longURL');
   res.redirect("/urls");
 });
 
