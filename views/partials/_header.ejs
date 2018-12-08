@@ -1,15 +1,14 @@
-  <% if(username) { %>
+  <% if(user) { %>
     <form method="POST" action="/logout">
       <%= user.email %>
       <input type="submit" value="Logout" />
     </form>
   <% } else { %>
-    <form method="POST" action="/login">
-      <input type="text" name="user_id" placeholder="user_id" />
-      <input type="submit" value="Login" />
+    <form method="GET" action="/urls/login">
+      <a href="/urls/login">Login</a>
     </form>
-    <form method="GET">
-      <a href="/register">Sign up</a>
+    <form method="GET" action="/urls/register">
+      <a href="urls/register">Sign up</a>
     </form>
   <% } %>
 

@@ -5,8 +5,8 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 
 function checkEmail(email) {
-  for(var i in users) {
-    if(users[i]["email"] === email) {
+  for(var key in users) {
+    if(users[key]["email"] === email) {
       return true;
     }
     return false;
@@ -46,29 +46,34 @@ const users = {
   },
   "sndd67": {
     id: "sndd67",
-    email: "demacia@noxian.com",
-    password: "123123"
+    email: "test@test.com",
+    password: "test"
   }
 };
 
 app.get("/", (req, res) => {
+  const userId = req.cookies.user_id;
+  const user = users[userId];
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
-  };
+    username: req.cookies["user_id"],
+    user: user
+  }
   res.send("<html><body><a href='/urls'>To IndexPage</a></body></html>");
-  // console.log(templateVars.urls);
-  // console.log(templateVars);
-  // console.log(users);
-  // console.log(users.userRandomID);
 });
 
-app.get("/register", (req, res) => {
-
-  res.render("registration");
+app.get("/urls/register", (req, res) => {
+  const userId = req.cookies.user_id;
+  const user = users[userId];
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["user_id"],
+    user: user
+  }
+  res.render("registration", templateVars);
 });
 
-app.post("/register", (req, res) => {
+app.post("/urls/register", (req, res) => {
   let randomID = generateRandomString();
   let id = randomID;
   let email = req.body.email;
@@ -90,8 +95,30 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello<b>World</b></body></html>\n");
 });
 
-app.post("/login", (req, res) => {
-  res.cookie("user_id", req.body.user_id);
+app.get("/urls/login", (req, res) => {
+  const userId = req.cookies.user_id;
+  const user = users[userId];
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["user_id"],
+    user: user
+  }
+  res.render("urls_login", templateVars);
+});
+
+function getUserObj(email) {
+  for(var key in users) {
+    if(users[key].email === email) {
+      // console.log(users[key]);
+      return users[key]
+    }
+  }
+}
+
+app.post("/urls/login", (req, res) => {
+  userObj = getUserObj(req.body.email)
+  res.cookie("user_id", userObj.id);
+  // console.log(users);
   res.redirect("/urls");
 });
 
@@ -112,11 +139,7 @@ app.post("/logout", (req, res) => {
 //     password: "dishwasher-funk"
 //   }
 // };
-function getUserObj(email) {
-for(var key in users) {
 
-  }
-}
 
 app.get("/urls", (req, res) => {
   const userId = req.cookies.user_id;
@@ -126,17 +149,18 @@ app.get("/urls", (req, res) => {
     username: req.cookies["user_id"],
     user: user
   }
-  // console.log(req.cookies)
-
+  // console.log(users)
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
+  const userId = req.cookies.user_id;
+  const user = users[userId];
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["user_id"]
-  };
-
+    username: req.cookies["user_id"],
+    user: user
+  }
   res.render("urls_new", templateVars);
 });
 
