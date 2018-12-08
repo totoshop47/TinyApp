@@ -67,7 +67,6 @@ app.get("/", (req, res) => {
   const user = users[userId];
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["user_id"],
     user: user
   }
   res.send("<html><body><a href='/urls'>To IndexPage</a></body></html>");
@@ -78,7 +77,6 @@ app.get("/urls/register", (req, res) => {
   const user = users[userId];
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["user_id"],
     user: user
   }
   res.render("registration", templateVars);
@@ -111,7 +109,6 @@ app.get("/urls/login", (req, res) => {
   const user = users[userId];
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["user_id"],
     user: user
   }
   res.render("urls_login", templateVars);
@@ -137,7 +134,6 @@ app.get("/urls", (req, res) => {
   const user = users[userId];
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["user_id"],
     user: user
   }
   // console.log(users)
@@ -149,7 +145,6 @@ app.get("/urls/new", (req, res) => {
   const user = users[userId];
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["user_id"],
     user: user
   }
   res.render("urls_new", templateVars);
@@ -170,7 +165,6 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["user_id"]
   };
   res.render("urls_show", templateVars);
 });
