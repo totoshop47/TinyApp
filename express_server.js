@@ -13,6 +13,23 @@ function checkEmail(email) {
   }
 }
 
+function urlsForUser(idCheck) {
+  var foundID;
+  var urlsInfo;
+
+  for(var userId in users) {
+    if(users[userId].id === idCheck) {
+      foundID = idCheck;
+    }
+  }
+  for(var info in urlDatabase) {
+    if(urlDatabase[info].userID === foundID) {
+      urlsInfo = urlDatabase[info];
+    }
+  }
+  return urlsInfo;
+}
+
 function generateRandomString() {
   var rString = "";
   var alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -40,7 +57,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
 var urlDatabase = {
-  "b2xVn2": { userID: "sndd67",
+  "b2xVn2": { userID: "sndd67",// <- so this thing has to be matched with .... users[userID from urlDatabase].id
               longUrl: "http://www.lighthouselabs.ca"},
 
   "9sm5xK": { userID: "user2RandomID",
@@ -59,7 +76,7 @@ const users = {
     password: "dishwasher-funk"
   },
   "sndd67": {
-    id: "sndd67",
+    id: "sndd67",// <-------------- this!!
     email: "test@test.com",
     password: "test"
   }
@@ -68,6 +85,7 @@ const users = {
 app.get("/", (req, res) => {
   const userId = req.cookies.user_id;
   const user = users[userId];
+
   // console.log(urlDatabase[req.params], '<<<<<<<<<<<< longURL')
   // console.log(urlDatabase, '<<<<<<<<<<<< urls')
   // console.log(req.body.id, '<<<<<<<<<<<<< req.params.id')
@@ -146,29 +164,48 @@ app.post("/logout", (req, res) => {
 // For specfic user and check by id.
 //
 app.get("/urls", (req, res) => {
-  const userId = req.cookies.user_id;
-  const user = users[userId];
+  let userId = req.cookies.user_id;
+  let user = users[userId];
+  // const userID = urlDatabase[req.params.id].userID;
+  // const urlsInfo = urlsForUser(userId);
+
+  if(!userId) {
+    userId = null;
+  }
   let templateVars = {
     urls: urlDatabase,
     user: user,
     userId: userId,
-    // shortURL: req.params.id,
-    // longURL: urlDatabase[req.params.id].longUrl,
-  }
-  // console.log(users)
+    // // userID: userID,
+    // urlsInfo: urlsInfo,
+    // longURL: urlsInfo.longUrl,
+  };
+  // if(userId !== undefined) {
   res.render("urls_index", templateVars);
+  // } else {
+  //   res.redirect("/urls");
+  // }
+  // console.log(userId);
+  // console.log(user.email);
+  // console.log(user.id);
+
 });
 
 app.get("/urls/new", (req, res) => {
   const userId = req.cookies.user_id;
   const user = users[userId];
+  const longURL = req.body.longURL;
+
   let templateVars = {
     urls: urlDatabase,
     user: user,
-    // shortURL: req.params.id,
-    // longURL: urlDatabase[req.params.id].longUrl,
+    // id: user.id,
+    userId: userId,
+    shortURL: req.params.id,
+    longURL: longURL,
   }
-  if(userId){
+
+  if(userId && userId !== undefined) {
     res.render("urls_new", templateVars);
   } else {
     res.redirect("/urls");
@@ -176,35 +213,62 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id].longUrl = req.body.longURL;
-  res.redirect("/urls");
-});
+  const userId = req.cookies.user_id;
+  const user = users[userId];
+  const longURL = req.body.longURL;
+  const userID = urlDatabase[req.params.id].userID;
+
+  if(userID !== userId){
+    res.redirect("/urls");   // what user typed in from /urls/ucxDTv goes to req.body.longURL and save it to urlDatabase[ucxDTv.id].longUrl
+    } else {
+      urlDatabase[req.params.id].longUrl = req.body.longURL;
+      res.redirect("/urls");
+    }
+  });
 
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
+  const userId = req.cookies.user_id;
+  const user = users[userId];
+  const longURL = req.body.longURL;
+  const userID = urlDatabase[req.params.id].userID;
 
-  res.redirect("/urls");
+  if(userID !== userId){
+    res.redirect("/urls");   // what user typed in from /urls/ucxDTv goes to req.body.longURL and save it to urlDatabase[ucxDTv.id].longUrl
+    } else {
+      delete urlDatabase[req.params.id];
+      res.redirect("/urls");
+    }
 });
 
 app.get("/urls/:id", (req, res) => {
+
   const userId = req.cookies.user_id;
   const user = users[userId];
+  const userID = urlDatabase[req.params.id].userID;
+
   let templateVars = {
     urls: urlDatabase,
     user: user,
-    // shortURL: req.params.id,
-    // longURL: urlDatabase[req.params.id].longUrl,
+    shortURL: req.params.id,
+    longURL: urlDatabase[req.params.id].longUrl,
   };
-  console.log(req.params.id, '<<<<<<<<<<<<<< req.params.id');
-  console.log(urlDatabase[req.params.id].longUrl, '<<<<<<<<<<<<<< urlsDatabase[req.params.id]');
-  res.render("urls_show", templateVars);
+
+  if(userId && userId !== undefined && userId === userID) {
+    res.render("urls_show", templateVars);
+  } else {
+    res.redirect("/urls");
+  }
 });
 
 app.post("/urls", (req, res) => {
-  var gRandom = generateRandomString();
-  urlDatabase[gRandom] = req.body.longURL;
+  var sUrl = generateRandomString();
+  var userId = req.cookies.user_id;
+  urlDatabase[sUrl] = {userID: userId, longUrl: req.body.longURL}
+  // urlDatabase[gRandom].userID = gRandom;
+  // urlDatabase[gRandom].longUrl = req.body.longURL;
+  // console.log(urlDatabase);
   // console.log(urlDatabase[gRandom]);
-  console.log(req.body.longURL, '<<<<<<<<<<<<<<<< req.body.longURL');
+  // console.log(req.body.longURL, '<<<<<<<<<<<<<<<< req.body.longURL');
   res.redirect("/urls");
 });
 

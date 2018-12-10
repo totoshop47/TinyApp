@@ -9,19 +9,29 @@
     <% include ./partials/_header %>
   </header>
   <ul>
-    <% for(var shortURL in urls) { %>
-    <li>
-      /* loop */
-      <form method="POST" action="/urls/<%= shortURL %>/delete">
-        <a href= <%= urls[shortURL].longUrl %>><%= shortURL %></a> <%= ` ->  ${urls[shortURL].longUrl}` %>
-        <a href="urls/<%= shortURL %>"> - Edit</a>
-        <button type="submit">Delete</button>
-      </form>
-    </li>
+    <% for(var short in urls) { %>
+      <% if(urls[short].userID === userId) { %>
+        <li>
+          <form method="POST" action="/urls/<%= short %>/delete">
+            <a href= <%= urls[short].longUrl %>><%= short %></a> <%= ` ->  ${urls[short].longUrl}` %>
+            <a href="urls/<%= short %>"> - Edit</a>
+            <button type="submit">Delete</button>
+          </form>
+        </li>
+      <% } else { %>
+        <li>
+          <form>
+            <a href= <%= urls[short].longUrl %>><%= short %></a>
+          </form>
+        </li>
+      <% } %>
     <% } %>
   </ul>
-  <a href="urls/new">New</a><br/>
-  <a href="/">Back to root</a>
+<% if(userId === null || userId === undefined) { %>
+  <h2>Please Login or Sign up for your own shortened websites :)</h2>
+<% } %>
+<a href="urls/new">New</a><br/>
+<a href="/">Back to root</a>
 
 </body>
 </html>
