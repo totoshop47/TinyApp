@@ -1,7 +1,7 @@
-var cookieSession = require('cookie-session');
-var express = require("express");
-var app = express();
-var PORT = 8080;
+const cookieSession = require('cookie-session');
+const express = require("express");
+const app = express();
+const PORT = 8080;
 const bodyParser = require("body-parser");
 // const cookieParser = require("cookie-parser");
 const bcrypt = require('bcrypt');
@@ -37,9 +37,9 @@ function generateRandomString() { // generate random string+numbers for userID o
   var rString = "";
   var alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-  for (var i = 0; i < 6; i++)
+  for (var i = 0; i < 6; i++) {
     rString += alphanumeric.charAt(Math.floor(Math.random() * alphanumeric.length));
-
+  }
   return rString;
 }
 
@@ -49,7 +49,7 @@ function getUserObj(emailInput) { // grab information from users data by Email
       return users[key];
     }
   }
-  return false;
+  return users[key];
 }
 
 // app.use(cookieParser());
@@ -64,7 +64,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
 
-var urlDatabase = {
+const urlDatabase = {
   "b2xVn2": { userID: "sndd67",
               longUrl: "http://www.lighthouselabs.ca"},
 
@@ -99,7 +99,7 @@ app.get("/urls/register", (req, res) => {
   const userId = req.session.user_id;
   const user = users[userId];
 
-  let templateVars = {
+  const templateVars = {
     urls: urlDatabase,
     user: user,
   }
@@ -107,18 +107,17 @@ app.get("/urls/register", (req, res) => {
 });
 
 app.post("/urls/register", (req, res) => {
-  let randomID = generateRandomString(); // random string+numbers for id (not for the shortenedURL !!)
-  let id = randomID;
-  let email = req.body.email;
+  const randomID = generateRandomString(); // random string+numbers for id (not for the shortenedURL !!)
+  const email = req.body.email;
   const password = bcrypt.hashSync(req.body.password, 10);
 
   if(email !== "" && password !== "") {  // Email and password input shouldn't be empty
     if(checkEmail(email)) {              // check Email overlapping, send error message if so
       res.status(400).send('The Email taken by someone else already.. try different one :(');
     } else {
-    users[randomID] = {id, email, password};
-    req.session.user_id = id;
-    res.redirect('/urls');
+      users[randomID] = {id: randomID, email, password};
+      req.session.user_id = randomID;
+      res.redirect('/urls');
     }
   } else {
     res.status(400).send('Bad request');
@@ -137,7 +136,7 @@ app.get("/urls/login", (req, res) => {
   const userId = req.session.user_id;
   const user = users[userId];
 
-  let templateVars = {
+  const templateVars = {
     urls: urlDatabase,
     user: user,
   }
@@ -162,18 +161,14 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let userId = req.session.user_id;
-  let user = users[userId];
+  const user = users[req.session.user_id];
 
-  if(!userId) {
-    userId = null;
-  }
-
-  let templateVars = {
+  const templateVars = {
     urls: urlDatabase,
     user: user,
-    userId: userId,
+    userId: req.session.user_id || null,
   };
+
   res.render("urls_index", templateVars);
 });
 
@@ -182,7 +177,7 @@ app.get("/urls/new", (req, res) => {
   const user = users[userId];
   const longURL = req.body.longURL;
 
-  let templateVars = {
+  const templateVars = {
     urls: urlDatabase,
     user: user,
     userId: userId,
@@ -229,7 +224,7 @@ app.get("/urls/:id", (req, res) => {
   const user = users[userId];
   const userID = urlDatabase[req.params.id].userID;
 
-  let templateVars = {
+  const templateVars = {
     urls: urlDatabase,
     user: user,
     shortURL: req.params.id,
@@ -244,15 +239,16 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  var sUrl = generateRandomString(); // random string+numbers for shortenURL (not for the id!!)
-  var userId = req.session.user_id;
+  const sUrl = generateRandomString(); // random string+numbers for shortenURL (not for the id!!)
+  const userId = req.session.user_id;
   urlDatabase[sUrl] = {userID: userId, longUrl: req.body.longURL}
 
   res.redirect("/urls");
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longUrl;
+
   res.redirect(longURL);
 });
 

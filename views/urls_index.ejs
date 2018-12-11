@@ -14,7 +14,7 @@
         <li>
           <form method="POST" action="/urls/<%= short %>/delete">
             <a href= <%= urls[short].longUrl %>><%= short %></a> <%= ` ->  ${urls[short].longUrl}` %>
-            <a href="urls/<%= short %>"> - Edit</a> <!-- original URL, Edit and Delete button only for logged in user -->
+            <a href="/urls/<%= short %>"> - Edit</a> <!-- original URL, Edit and Delete button only for logged in user -->
             <button type="submit">Delete</button>
           </form>
         </li>
@@ -30,7 +30,7 @@
   <% if(userId === null || userId === undefined) { %>
     <h2>Please Login or Sign up for your own shortened websites :)</h2>
   <% } %>
-  <a href="urls/new">New</a><br/>
+  <a href="/urls/new">New</a><br/>
   <a href="/">Back to root</a>
 
 </body>
