@@ -6,11 +6,15 @@
 <body>
   <h1>User Registration</h1>
   <form action="/urls/register" method="POST">
-      <label for="email">Email: </label>
-      <input type="email" id="email" name="email">
-      <label for="password">Password: </label>
-      <input type="password" id="password" name="password">
-      <button class="button" type="submit">Sign up</button>
+    <label for="email">Email: </label>
+    <input type="email" id="email" name="email">
+    <label for="password">Password: </label>
+    <input type="password" id="password" name="password">
+    <button class="button" type="submit">Sign up</button>
+  </form>
+  <form method="GET" action="/urls/login">
+    <a href="/urls/login">Login</a><br>
+    <a href="/urls">Back to index-page</a>
   </form>
 </body>
 </html>

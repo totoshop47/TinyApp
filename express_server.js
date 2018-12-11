@@ -118,8 +118,6 @@ app.post("/urls/register", (req, res) => {
     } else {
     users[randomID] = {id, email, password};
     req.session.user_id = id;
-    console.log(users);
-    console.log(urlDatabase);
     res.redirect('/urls');
     }
   } else {

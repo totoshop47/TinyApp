@@ -4,6 +4,7 @@
   <body>
     <header>
       <% include ./partials/_header %>
+      <a href="/urls">Back to index-page</a>
     </header>
     <h1>ShortURL: <%= shortURL %></h1>
     <form method="POST" action="/urls/<%= shortURL %>">
